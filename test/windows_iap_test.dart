@@ -1,15 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:windows_iap/windows_iap.dart';
-import 'package:windows_iap/windows_iap_platform_interface.dart';
-import 'package:windows_iap/windows_iap_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:windows_iap/models/product.dart';
+import 'package:windows_iap/windows_iap.dart';
+import 'package:windows_iap/windows_iap_method_channel.dart';
+import 'package:windows_iap/windows_iap_platform_interface.dart';
 
-class MockWindowsIapPlatform 
-    with MockPlatformInterfaceMixin
-    implements WindowsIapPlatform {
-
+class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsIapPlatform {
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+
+  @override
+  Stream<String> errorStream() {
+    // TODO: implement errorStream
+    throw UnimplementedError();
+  }
+
+  @override
+  void getProducts() {
+    // TODO: implement getProducts
+  }
+
+  @override
+  Future<StorePurchaseStatus?> makePurchase(String storeId) {
+    // TODO: implement makePurchase
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Product>> productsStream() {
+    // TODO: implement productsStream
+    throw UnimplementedError();
+  }
 }
 
 void main() {
@@ -23,7 +44,7 @@ void main() {
     WindowsIap windowsIapPlugin = WindowsIap();
     MockWindowsIapPlatform fakePlatform = MockWindowsIapPlatform();
     WindowsIapPlatform.instance = fakePlatform;
-  
+
     expect(await windowsIapPlugin.getPlatformVersion(), '42');
   });
 }

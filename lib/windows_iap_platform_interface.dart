@@ -1,4 +1,5 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:windows_iap/models/product.dart';
 
 import 'windows_iap.dart';
 import 'windows_iap_method_channel.dart';
@@ -30,5 +31,17 @@ abstract class WindowsIapPlatform extends PlatformInterface {
 
   Future<StorePurchaseStatus?> makePurchase(String storeId) {
     throw UnimplementedError('makePurchase() has not been implemented.');
+  }
+
+  Stream<String> errorStream() {
+    throw UnimplementedError('errorStream() has not been implemented.');
+  }
+
+  Stream<List<Product>> productsStream() {
+    throw UnimplementedError('productsStream() has not been implemented.');
+  }
+
+  void getProducts() {
+    throw UnimplementedError('getProducts() has not been implemented.');
   }
 }

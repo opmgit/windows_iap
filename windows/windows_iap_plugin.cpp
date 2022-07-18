@@ -30,8 +30,10 @@ namespace foundation = Windows::Foundation;
 
 namespace windows_iap {
 
+    //////////////////////////////////////////////////////////////////////// BEGIN OF MY CODE //////////////////////////////////////////////////////////////
     flutter::PluginRegistrarWindows* _registrar;
-    std::unique_ptr<flutter::EventSink<>> _event;
+    std::unique_ptr<flutter::EventSink<>> _eventError;
+    std::unique_ptr<flutter::EventSink<>> _eventProducts;
 
     HWND GetRootWindow(flutter::FlutterView* view) {
         return ::GetAncestor(view->GetNativeWindow(), GA_ROOT);
@@ -94,11 +96,7 @@ namespace windows_iap {
     }
 
     foundation::IAsyncAction makePurchase(hstring storeId, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback)
-    {
-
-        if (_event != nullptr) {
-            _event->Success(flutter::EncodableValue("day la string 2"));
-        }
+    { 
         StorePurchaseResult result = co_await getStore().RequestPurchaseAsync(storeId);
 
         if (result.ExtendedError().value != S_OK) {
@@ -137,13 +135,38 @@ namespace windows_iap {
         resultCallback->Success(flutter::EncodableValue(returnCode));
     }
 
+    void sendProductsToFlutter(std::vector<StoreProduct> products) {
+        std::stringstream ss;
+        ss << "[";
+        for (int i = 0; i < products.size();i++) {
+            auto product = products.at(i);
+            ss << "{";
+            ss << "\"title\":\"" << to_string(product.Title()) << "\",";
+            ss << "\"description\":\"" << to_string(product.Description()) << "\",";
+            ss << "\"price\":\"" << to_string(product.Price().FormattedPrice()) << "\",";
+            ss << "\"inCollection\":" << product.IsInUserCollection() << ",";
+            ss << "\"productKind\":\"" << to_string(product.ProductKind()) << "\",";
+            ss << "\"storeId\":\"" << to_string(product.StoreId()) << "\"";
+            ss << "}";
+            if (i != products.size() - 1) {
+                ss << ",";
+            }
+        }
+        ss << "]";
+
+        if (_eventProducts != nullptr) {
+            _eventProducts->Success(flutter::EncodableValue(ss.str()));
+        }
+    }
+
     foundation::IAsyncAction getProducts() {
+
         auto result = co_await getStore().GetAssociatedStoreProductsAsync({ L"Consumable", L"Durable", L"UnmanagedConsumable" });
         if (result.ExtendedError().value != S_OK) {
-            getExtendedErrorString(result.ExtendedError());
+            _eventError->Success(flutter::EncodableValue("Code: " + std::to_string(result.ExtendedError().value) + " - " + getExtendedErrorString(result.ExtendedError())));
         }
         else if (result.Products().Size() == 0) {
-            // send error: This Product has not been properly configured.
+            _eventProducts->Success(flutter::EncodableValue("[]"));
         }
         else {
             std::vector<StoreProduct> products;
@@ -152,8 +175,12 @@ namespace windows_iap {
                 StoreProduct product = addOn.Value();
                 products.push_back(product);
             }
+            sendProductsToFlutter(products);
         }
     }
+
+
+    //////////////////////////////////////////////////////////////////////// END OF MY CODE //////////////////////////////////////////////////////////////
 
 // static
 void WindowsIapPlugin::RegisterWithRegistrar(
@@ -172,20 +199,37 @@ void WindowsIapPlugin::RegisterWithRegistrar(
         plugin_pointer->HandleMethodCall(call, std::move(result));
       });
 
-  auto event = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
-      registrar->messenger(),"windows_iap_event",
+  ///////////////////////// register for event error
+  auto eventError = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
+      registrar->messenger(),"windows_iap_event_error",
       &flutter::StandardMethodCodec::GetInstance());
-  auto handler = std::make_unique<flutter::StreamHandlerFunctions<>>(
+  auto handlerError = std::make_unique<flutter::StreamHandlerFunctions<>>(
       [](const flutter::EncodableValue* arguments,
           std::unique_ptr<flutter::EventSink<>>&& events)
       -> std::unique_ptr<flutter::StreamHandlerError<>> {
-          _event = std::move(events);
+          _eventError = std::move(events);
           return nullptr;
       },
       [](const flutter::EncodableValue* arguments)
-          -> std::unique_ptr<flutter::StreamHandlerError<>> { _event.release(); return nullptr; });
+          -> std::unique_ptr<flutter::StreamHandlerError<>> { _eventError.release(); return nullptr; });
 
-  event->SetStreamHandler(std::move(handler));
+  eventError->SetStreamHandler(std::move(handlerError));
+
+  //////////////////////// register for event products
+  auto eventProducts = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
+      registrar->messenger(), "windows_iap_event_products",
+      &flutter::StandardMethodCodec::GetInstance());
+  auto handlerProducts = std::make_unique<flutter::StreamHandlerFunctions<>>(
+      [](const flutter::EncodableValue* arguments,
+          std::unique_ptr<flutter::EventSink<>>&& events)
+      -> std::unique_ptr<flutter::StreamHandlerError<>> {
+          _eventProducts = std::move(events);
+          return nullptr;
+      },
+      [](const flutter::EncodableValue* arguments)
+          -> std::unique_ptr<flutter::StreamHandlerError<>> { _eventProducts.release(); return nullptr; });
+
+  eventProducts->SetStreamHandler(std::move(handlerProducts));
 
   registrar->AddPlugin(std::move(plugin));
 }

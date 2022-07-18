@@ -18,14 +18,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _windowsIapPlugin = WindowsIap();
-  final stream = EventChannel('windows_iap_event');
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    stream.receiveBroadcastStream().listen((event) {
-      print('event is: $event');
+    _windowsIapPlugin.errorStream().listen((event) {
+      print('error event is: $event');
+    });
+    _windowsIapPlugin.productsStream().listen((event) {
+      event.forEach((element) {
+        print(element.toJson());
+      });
     });
   }
 
@@ -64,10 +68,15 @@ class _MyAppState extends State<MyApp> {
               Text('Running on: $_platformVersion\n'),
               ElevatedButton(
                   onPressed: () async {
-                    final result = await WindowsIap().makePurchase('hihi');
+                    final result = await _windowsIapPlugin.makePurchase('hihi');
                     print('result is $result');
                   },
-                  child: Text('makePurchase'))
+                  child: Text('makePurchase')),
+              ElevatedButton(
+                  onPressed: () async {
+                    _windowsIapPlugin.getProducts();
+                  },
+                  child: Text('getProducts')),
             ],
           ),
         ),

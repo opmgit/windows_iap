@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'models/product.dart';
+import 'utils.dart';
 import 'windows_iap.dart';
 import 'windows_iap_platform_interface.dart';
 
@@ -35,5 +39,32 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
         return StorePurchaseStatus.serverError;
     }
     return null;
+  }
+
+  @override
+  Stream<String> errorStream() {
+    return const EventChannel('windows_iap_event_error').receiveBroadcastStream().map((event) {
+      if (event is String) {
+        return event;
+      } else {
+        return "";
+      }
+    });
+  }
+
+  @override
+  Stream<List<Product>> productsStream() {
+    return const EventChannel('windows_iap_event_products').receiveBroadcastStream().map((event) {
+      if (event is String) {
+        return parseListNotNull(json: jsonDecode(event), fromJson: Product.fromJson);
+      } else {
+        return [];
+      }
+    });
+  }
+
+  @override
+  void getProducts() {
+    methodChannel.invokeMethod<int>('getProducts');
   }
 }
