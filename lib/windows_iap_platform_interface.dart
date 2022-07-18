@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'windows_iap.dart';
 import 'windows_iap_method_channel.dart';
 
 abstract class WindowsIapPlatform extends PlatformInterface {
@@ -27,7 +28,7 @@ abstract class WindowsIapPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<bool?> makePurchase(String storeId) {
+  Future<StorePurchaseStatus?> makePurchase(String storeId) {
     throw UnimplementedError('makePurchase() has not been implemented.');
   }
 }

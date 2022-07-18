@@ -59,8 +59,9 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text('Running on: $_platformVersion\n'),
               ElevatedButton(
-                  onPressed: () {
-                    WindowsIap().makePurchase('hihi');
+                  onPressed: () async {
+                    final result = await WindowsIap().makePurchase('hihi');
+                    print('result is $result');
                   },
                   child: Text('makePurchase'))
             ],

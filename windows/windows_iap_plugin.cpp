@@ -75,7 +75,7 @@ namespace windows_iap {
         return ss.str();
     }
 
-    void reportExtendedError(winrt::hresult error) {
+    std::string getExtendedErrorString(winrt::hresult error) {
         const HRESULT IAP_E_UNEXPECTED = 0x803f6107L;
         std::string message;
         if (error.value == IAP_E_UNEXPECTED) {
@@ -84,18 +84,53 @@ namespace windows_iap {
         else {
             message = "ExtendedError: " + std::to_string(error.value);
         }
+        return message;
     }
 
-    foundation::IAsyncAction makePurchase(hstring storeId)
+    foundation::IAsyncAction makePurchase(hstring storeId, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback)
     {
         StorePurchaseResult result = co_await getStore().RequestPurchaseAsync(storeId);
-        OutputDebugString(s2ws(debugString2(result)).c_str());
+
+        if (result.ExtendedError().value != S_OK) {
+            resultCallback->Error(std::to_string(result.ExtendedError().value), getExtendedErrorString(result.ExtendedError().value));
+            co_return;
+        }
+        int32_t returnCode;
+        switch (result.Status()) {
+            case StorePurchaseStatus::AlreadyPurchased:
+                returnCode = 1; 
+                break;
+
+            case StorePurchaseStatus::Succeeded:
+                returnCode = 0;
+                break;
+
+            case StorePurchaseStatus::NotPurchased:
+                returnCode = 2;
+                break;
+
+            case StorePurchaseStatus::NetworkError:
+                returnCode = 3;
+                break;
+
+            case StorePurchaseStatus::ServerError:
+                returnCode = 4;
+                break;
+
+            default:
+                auto status = reinterpret_cast<int32_t*>(result.Status());
+                resultCallback->Error(std::to_string(*status), "Product was not purchased due to an unknown error.");
+                co_return;
+                break;
+        }
+
+        resultCallback->Success(flutter::EncodableValue(returnCode));
     }
 
     foundation::IAsyncAction getProducts() {
         auto result = co_await getStore().GetAssociatedStoreProductsAsync({ L"Consumable", L"Durable", L"UnmanagedConsumable" });
         if (result.ExtendedError().value != S_OK) {
-            reportExtendedError(result.ExtendedError());
+            getExtendedErrorString(result.ExtendedError());
         }
         else if (result.Products().Size() == 0) {
             // send error: This Product has not been properly configured.
@@ -151,7 +186,7 @@ void WindowsIapPlugin::HandleMethodCall(
   else if (method_call.method_name().compare("makePurchase") == 0) {
       auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
       auto storeId = std::get<std::string>(args[flutter::EncodableValue("storeId")]);
-      makePurchase(to_hstring(storeId));
+      makePurchase(to_hstring(storeId), std::move(result));
   }else {
     result->NotImplemented();
   }
