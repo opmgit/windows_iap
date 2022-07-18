@@ -18,11 +18,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _windowsIapPlugin = WindowsIap();
+  final stream = EventChannel('windows_iap_event');
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    stream.receiveBroadcastStream().listen((event) {
+      print('event is: $event');
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.

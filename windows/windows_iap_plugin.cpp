@@ -18,6 +18,11 @@
 #include <winrt/Windows.Foundation.Collections.h>
 #include <shobjidl.h>
 
+#include <flutter/event_sink.h>
+#include <flutter/event_channel.h>
+#include <flutter/event_stream_handler.h>
+#include <flutter/event_stream_handler_functions.h>
+
 using namespace winrt;
 using namespace Windows::Services::Store;
 using namespace Windows::Foundation::Collections;
@@ -26,6 +31,7 @@ namespace foundation = Windows::Foundation;
 namespace windows_iap {
 
     flutter::PluginRegistrarWindows* _registrar;
+    std::unique_ptr<flutter::EventSink<>> _event;
 
     HWND GetRootWindow(flutter::FlutterView* view) {
         return ::GetAncestor(view->GetNativeWindow(), GA_ROOT);
@@ -89,6 +95,10 @@ namespace windows_iap {
 
     foundation::IAsyncAction makePurchase(hstring storeId, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback)
     {
+
+        if (_event != nullptr) {
+            _event->Success(flutter::EncodableValue("day la string 2"));
+        }
         StorePurchaseResult result = co_await getStore().RequestPurchaseAsync(storeId);
 
         if (result.ExtendedError().value != S_OK) {
@@ -149,6 +159,7 @@ namespace windows_iap {
 void WindowsIapPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar) {
     _registrar = registrar;
+
   auto channel =
       std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
           registrar->messenger(), "windows_iap",
@@ -160,6 +171,21 @@ void WindowsIapPlugin::RegisterWithRegistrar(
       [plugin_pointer = plugin.get()](const auto &call, auto result) {
         plugin_pointer->HandleMethodCall(call, std::move(result));
       });
+
+  auto event = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
+      registrar->messenger(),"windows_iap_event",
+      &flutter::StandardMethodCodec::GetInstance());
+  auto handler = std::make_unique<flutter::StreamHandlerFunctions<>>(
+      [](const flutter::EncodableValue* arguments,
+          std::unique_ptr<flutter::EventSink<>>&& events)
+      -> std::unique_ptr<flutter::StreamHandlerError<>> {
+          _event = std::move(events);
+          return nullptr;
+      },
+      [](const flutter::EncodableValue* arguments)
+          -> std::unique_ptr<flutter::StreamHandlerError<>> { _event.release(); return nullptr; });
+
+  event->SetStreamHandler(std::move(handler));
 
   registrar->AddPlugin(std::move(plugin));
 }
@@ -187,6 +213,8 @@ void WindowsIapPlugin::HandleMethodCall(
       auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
       auto storeId = std::get<std::string>(args[flutter::EncodableValue("storeId")]);
       makePurchase(to_hstring(storeId), std::move(result));
+  }else if(method_call.method_name().compare("getProducts") == 0){
+      getProducts();
   }else {
     result->NotImplemented();
   }
