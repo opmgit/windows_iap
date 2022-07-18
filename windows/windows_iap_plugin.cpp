@@ -20,6 +20,7 @@
 
 using namespace winrt;
 using namespace Windows::Services::Store;
+using namespace Windows::Foundation::Collections;
 namespace foundation = Windows::Foundation;
 
 namespace windows_iap {
@@ -74,10 +75,39 @@ namespace windows_iap {
         return ss.str();
     }
 
+    void reportExtendedError(winrt::hresult error) {
+        const HRESULT IAP_E_UNEXPECTED = 0x803f6107L;
+        std::string message;
+        if (error.value == IAP_E_UNEXPECTED) {
+            message = "This Product has not been properly configured.";
+        }
+        else {
+            message = "ExtendedError: " + std::to_string(error.value);
+        }
+    }
+
     foundation::IAsyncAction makePurchase(hstring storeId)
     {
         StorePurchaseResult result = co_await getStore().RequestPurchaseAsync(storeId);
         OutputDebugString(s2ws(debugString2(result)).c_str());
+    }
+
+    foundation::IAsyncAction getProducts() {
+        auto result = co_await getStore().GetAssociatedStoreProductsAsync({ L"Consumable", L"Durable", L"UnmanagedConsumable" });
+        if (result.ExtendedError().value != S_OK) {
+            reportExtendedError(result.ExtendedError());
+        }
+        else if (result.Products().Size() == 0) {
+            // send error: This Product has not been properly configured.
+        }
+        else {
+            std::vector<StoreProduct> products;
+            for (IKeyValuePair<hstring, StoreProduct> addOn : result.Products())
+            {
+                StoreProduct product = addOn.Value();
+                products.push_back(product);
+            }
+        }
     }
 
 // static
