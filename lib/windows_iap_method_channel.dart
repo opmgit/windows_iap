@@ -14,4 +14,10 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  @override
+  Future<bool?> makePurchase(String storeId) async {
+    final result = await methodChannel.invokeMethod<bool>('makePurchase', {'storeId': storeId});
+    return result;
+  }
 }

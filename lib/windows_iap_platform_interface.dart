@@ -14,7 +14,7 @@ abstract class WindowsIapPlatform extends PlatformInterface {
   ///
   /// Defaults to [MethodChannelWindowsIap].
   static WindowsIapPlatform get instance => _instance;
-  
+
   /// Platform-specific implementations should set this with their own
   /// platform-specific class that extends [WindowsIapPlatform] when
   /// they register themselves.
@@ -25,5 +25,9 @@ abstract class WindowsIapPlatform extends PlatformInterface {
 
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<bool?> makePurchase(String storeId) {
+    throw UnimplementedError('makePurchase() has not been implemented.');
   }
 }
