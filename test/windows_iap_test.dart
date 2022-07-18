@@ -31,6 +31,12 @@ class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsI
     // TODO: implement productsStream
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool?> checkPurchase() {
+    // TODO: implement checkPurchase
+    throw UnimplementedError();
+  }
 }
 
 void main() {

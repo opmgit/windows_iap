@@ -30,4 +30,8 @@ class WindowsIap {
   void getProducts() {
     return WindowsIapPlatform.instance.getProducts();
   }
+
+  Future<bool?> checkPurchase() {
+    return WindowsIapPlatform.instance.checkPurchase();
+  }
 }

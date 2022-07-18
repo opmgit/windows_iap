@@ -67,4 +67,10 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   void getProducts() {
     methodChannel.invokeMethod<int>('getProducts');
   }
+
+  @override
+  Future<bool?> checkPurchase() async {
+    final result = await methodChannel.invokeMethod<bool>('checkPurchase');
+    return result ?? true;
+  }
 }

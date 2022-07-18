@@ -179,6 +179,16 @@ namespace windows_iap {
         }
     }
 
+    foundation::IAsyncAction checkPurchase(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback) {
+        auto result = co_await getStore().GetAppLicenseAsync();
+        if (result.IsActive()) {
+            resultCallback->Success(flutter::EncodableValue(true));
+        }
+        else {
+            resultCallback->Success(flutter::EncodableValue(false));
+        }
+    }
+
 
     //////////////////////////////////////////////////////////////////////// END OF MY CODE //////////////////////////////////////////////////////////////
 
@@ -259,7 +269,11 @@ void WindowsIapPlugin::HandleMethodCall(
       makePurchase(to_hstring(storeId), std::move(result));
   }else if(method_call.method_name().compare("getProducts") == 0){
       getProducts();
-  }else {
+  }
+  else if (method_call.method_name().compare("checkPurchase") == 0) {
+      checkPurchase(std::move(result));
+  }
+  else {
     result->NotImplemented();
   }
 }

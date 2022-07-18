@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:windows_iap/windows_iap.dart';
@@ -57,30 +58,41 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Running on: $_platformVersion\n'),
-              ElevatedButton(
-                  onPressed: () async {
-                    final result = await _windowsIapPlugin.makePurchase('hihi');
-                    print('result is $result');
-                  },
-                  child: Text('makePurchase')),
-              ElevatedButton(
-                  onPressed: () async {
-                    _windowsIapPlugin.getProducts();
-                  },
-                  child: Text('getProducts')),
-            ],
+      home: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
           ),
-        ),
-      ),
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Running on: $_platformVersion\n'),
+                Gap(16),
+                ElevatedButton(
+                    onPressed: () async {
+                      final result = await _windowsIapPlugin.checkPurchase();
+                      showAlertDialog(context, content: 'checkPurchase: $result');
+                    },
+                    child: Text('checkPurchase')),
+                Gap(16),
+                ElevatedButton(
+                    onPressed: () async {
+                      final result = await _windowsIapPlugin.makePurchase('hihi');
+                      print('result is $result');
+                    },
+                    child: Text('makePurchase')),
+                Gap(16),
+                ElevatedButton(
+                    onPressed: () async {
+                      _windowsIapPlugin.getProducts();
+                    },
+                    child: Text('getProducts')),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 }
