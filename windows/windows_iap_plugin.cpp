@@ -71,18 +71,6 @@ namespace windows_iap {
         return ss.str();
     }
 
-
-    std::string debugString2(StorePurchaseResult result) {
-
-        std::stringstream ss;
-        ss << "( ";
-        ss << result.ExtendedError().value << ", ";
-        auto status = reinterpret_cast<int32_t*>(result.Status());
-        ss << status << ", ";
-        ss << " )\n";
-        return ss.str();
-    }
-
     std::string getExtendedErrorString(winrt::hresult error) {
         const HRESULT IAP_E_UNEXPECTED = 0x803f6107L;
         std::string message;
@@ -180,10 +168,39 @@ namespace windows_iap {
         }
     }
 
-    foundation::IAsyncAction checkPurchase(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback) {
+    /// <summary>
+    ///  need to test in real app on store
+    /// </summary>
+    foundation::IAsyncAction checkPurchase(std::string storeId, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback) {
         auto result = co_await getStore().GetAppLicenseAsync();
+        
         if (result.IsActive()) {
-            resultCallback->Success(flutter::EncodableValue(true));
+
+            auto addonLicenses = result.AddOnLicenses();
+
+            for (IKeyValuePair<hstring, StoreLicense> addonLicense : addonLicenses)
+            {
+                StoreLicense license = addonLicense.Value();
+
+                if (storeId.compare("") == 0) {
+                    // Truong hop storeId empty => bat ky Add-on nao co IsActive = true deu return true
+                    if (license.IsActive()) {
+                        resultCallback->Success(flutter::EncodableValue(true));
+                        co_return;
+                    }
+                }
+                else {
+                    // Truong hop storeId not empty => check key = storeId
+                    auto key = to_string(addonLicense.Key());
+                    if (key.compare(storeId) == 0) {
+                        resultCallback->Success(flutter::EncodableValue(license.IsActive()));
+                        co_return;
+                    }
+                }
+                
+            }
+            // truong hop duyet het add-on license nhung vang khong tim thay IsActive = true thi return false
+            resultCallback->Success(flutter::EncodableValue(false));
         }
         else {
             resultCallback->Success(flutter::EncodableValue(false));
@@ -272,7 +289,9 @@ void WindowsIapPlugin::HandleMethodCall(
       getProducts();
   }
   else if (method_call.method_name().compare("checkPurchase") == 0) {
-      checkPurchase(std::move(result));
+      auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
+      auto storeId = std::get<std::string>(args[flutter::EncodableValue("storeId")]);
+      checkPurchase(storeId,std::move(result));
   }
   else {
     result->NotImplemented();

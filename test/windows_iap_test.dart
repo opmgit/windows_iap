@@ -33,7 +33,7 @@ class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsI
   }
 
   @override
-  Future<bool?> checkPurchase() {
+  Future<bool?> checkPurchase({required String storeId}) {
     // TODO: implement checkPurchase
     throw UnimplementedError();
   }
