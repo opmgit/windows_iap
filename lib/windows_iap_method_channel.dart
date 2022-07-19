@@ -15,12 +15,6 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   final methodChannel = const MethodChannel('windows_iap');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
-  @override
   Future<StorePurchaseStatus?> makePurchase(String storeId) async {
     final result = await methodChannel.invokeMethod<int>('makePurchase', {'storeId': storeId});
     if (result == null) {

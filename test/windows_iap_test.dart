@@ -7,9 +7,6 @@ import 'package:windows_iap/windows_iap_platform_interface.dart';
 
 class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsIapPlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
-  @override
   Stream<String> errorStream() {
     // TODO: implement errorStream
     throw UnimplementedError();
@@ -51,6 +48,6 @@ void main() {
     MockWindowsIapPlatform fakePlatform = MockWindowsIapPlatform();
     WindowsIapPlatform.instance = fakePlatform;
 
-    expect(await windowsIapPlugin.getPlatformVersion(), '42');
+    // expect(await windowsIapPlugin.getPlatformVersion(), '42');
   });
 }

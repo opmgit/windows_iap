@@ -19,10 +19,6 @@ class WindowsIap {
     return WindowsIapPlatform.instance.productsStream();
   }
 
-  Future<String?> getPlatformVersion() {
-    return WindowsIapPlatform.instance.getPlatformVersion();
-  }
-
   Future<StorePurchaseStatus?> makePurchase(String storeId) {
     return WindowsIapPlatform.instance.makePurchase(storeId);
   }

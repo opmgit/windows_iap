@@ -25,10 +25,6 @@ abstract class WindowsIapPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   Future<StorePurchaseStatus?> makePurchase(String storeId) {
     throw UnimplementedError('makePurchase() has not been implemented.');
   }
