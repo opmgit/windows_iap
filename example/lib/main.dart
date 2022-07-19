@@ -60,6 +60,13 @@ class _MyAppState extends State<MyApp> {
                       _windowsIapPlugin.getProducts();
                     },
                     child: Text('getProducts')),
+                Gap(16),
+                ElevatedButton(
+                    onPressed: () async {
+                      final result = await _windowsIapPlugin.getAddonLicenses();
+                      print('licenses: $result');
+                    },
+                    child: Text('getAddonLicenses')),
               ],
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:windows_iap/models/product.dart';
 
+import 'models/store_license.dart';
 import 'windows_iap_platform_interface.dart';
 
 enum StorePurchaseStatus {
@@ -46,5 +47,14 @@ class WindowsIap {
   /// -- return false if all Add-On have IsActive status = false.
   Future<bool?> checkPurchase({String storeId = ''}) {
     return WindowsIapPlatform.instance.checkPurchase(storeId: storeId);
+  }
+
+  /// return the map of StoreLicense
+  ///
+  /// A map of key and value pairs, where each key is the Store ID of an add-on SKU from the
+  /// Microsoft Store catalog and each value is a StoreLicense object that contains license
+  /// info for the add-on.
+  Future<Map<String, StoreLicense>> getAddonLicenses() {
+    return WindowsIapPlatform.instance.getAddonLicenses();
   }
 }

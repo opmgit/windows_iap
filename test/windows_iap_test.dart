@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:windows_iap/models/product.dart';
+import 'package:windows_iap/models/store_license.dart';
 import 'package:windows_iap/windows_iap.dart';
 import 'package:windows_iap/windows_iap_method_channel.dart';
 import 'package:windows_iap/windows_iap_platform_interface.dart';
@@ -32,6 +33,12 @@ class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsI
   @override
   Future<bool?> checkPurchase({required String storeId}) {
     // TODO: implement checkPurchase
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, StoreLicense>> getAddonLicenses() {
+    // TODO: implement getAddonLicenses
     throw UnimplementedError();
   }
 }

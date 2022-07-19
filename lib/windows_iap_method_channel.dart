@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'models/product.dart';
+import 'models/store_license.dart';
 import 'utils.dart';
 import 'windows_iap.dart';
 import 'windows_iap_platform_interface.dart';
@@ -66,5 +67,15 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   Future<bool?> checkPurchase({required String storeId}) async {
     final result = await methodChannel.invokeMethod<bool>('checkPurchase', {'storeId': storeId});
     return result ?? true;
+  }
+
+  @override
+  Future<Map<String, StoreLicense>> getAddonLicenses() async {
+    final result = await methodChannel.invokeMethod<Map>('getAddonLicenses');
+    if (result == null) {
+      return {};
+    }
+    return result
+        .map((key, value) => MapEntry(key.toString(), StoreLicense.fromJson(jsonDecode(value))));
   }
 }
