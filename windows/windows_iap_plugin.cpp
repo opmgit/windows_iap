@@ -163,6 +163,7 @@ namespace windows_iap {
 
         auto result = co_await getStore().GetAssociatedStoreProductsAsync({ L"Consumable", L"Durable", L"UnmanagedConsumable" });
         if (result.ExtendedError().value != S_OK) {
+            _eventProducts->Success(flutter::EncodableValue("[]"));
             _eventError->Success(flutter::EncodableValue("Code: " + std::to_string(result.ExtendedError().value) + " - " + getExtendedErrorString(result.ExtendedError())));
         }
         else if (result.Products().Size() == 0) {
