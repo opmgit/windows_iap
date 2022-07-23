@@ -18,7 +18,7 @@ set(PLUGIN_NAME "windows_iap_plugin")
 ################ NuGet intall begin ################
 FetchContent_Declare(nuget
   URL "https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
-  URL_HASH SHA256=04eb6c4fe4213907e2773e1be1bbbd730e9a655a3c9c58387ce8d4a714a5b9e1
+  URL_HASH SHA256=a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
   DOWNLOAD_NO_EXTRACT true
 )
 
