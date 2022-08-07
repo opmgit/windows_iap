@@ -9,7 +9,7 @@ set(PROJECT_NAME "windows_iap")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
 include(FetchContent)
-set(CPPWINRT_VERSION "2.0.220418.1")
+set(CPPWINRT_VERSION "2.0.220608.4")
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed
