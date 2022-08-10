@@ -9,6 +9,40 @@ import 'utils.dart';
 import 'windows_iap.dart';
 import 'windows_iap_platform_interface.dart';
 
+/// A [Map] between whitespace characters and their escape sequences.
+const _escapeMap = {
+  '\n': '',
+  '\r': '',
+  '\f': '',
+  '\b': '',
+  '\t': '',
+  '\v': '',
+  '\x7F': '', // delete
+};
+
+/// A [RegExp] that matches whitespace characters that should be escaped.
+var _escapeRegExp = RegExp(
+    '[\\x00-\\x07\\x0E-\\x1F${_escapeMap.keys.map(_getHexLiteral).join()}]');
+
+/// Returns [str] with all whitespace characters represented as their escape
+/// sequences.
+///
+/// Backslash characters are escaped as `\\`
+String escape(String str) {
+  str = str.replaceAll('\\', r'\\');
+  return str.replaceAllMapped(_escapeRegExp, (match) {
+    var mapped = _escapeMap[match[0]];
+    if (mapped != null) return mapped;
+    return _getHexLiteral(match[0]!);
+  });
+}
+
+/// Given single-character string, return the hex-escaped equivalent.
+String _getHexLiteral(String input) {
+  var rune = input.runes.single;
+  return r'\x' + rune.toRadixString(16).toUpperCase().padLeft(2, '0');
+}
+
 /// An implementation of [WindowsIapPlatform] that uses method channels.
 class MethodChannelWindowsIap extends WindowsIapPlatform {
   /// The method channel used to interact with the native platform.
@@ -51,7 +85,7 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   Stream<List<Product>> productsStream() {
     return const EventChannel('windows_iap_event_products').receiveBroadcastStream().map((event) {
       if (event is String) {
-        return parseListNotNull(json: jsonDecode(event), fromJson: Product.fromJson);
+        return parseListNotNull(json: jsonDecode(escape(event)), fromJson: Product.fromJson);
       } else {
         return [];
       }
