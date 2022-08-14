@@ -45,7 +45,7 @@ class WindowsIap {
   /// -- it will return true if any Add-On have IsActive status = true.
   ///
   /// -- return false if all Add-On have IsActive status = false.
-  Future<bool?> checkPurchase({String storeId = ''}) {
+  Future<bool> checkPurchase({String storeId = ''}) {
     return WindowsIapPlatform.instance.checkPurchase(storeId: storeId);
   }
 

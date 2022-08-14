@@ -42,7 +42,7 @@ abstract class WindowsIapPlatform extends PlatformInterface {
     throw UnimplementedError('getProducts() has not been implemented.');
   }
 
-  Future<bool?> checkPurchase({required String storeId}) {
+  Future<bool> checkPurchase({required String storeId}) {
     throw UnimplementedError('checkPurchase() has not been implemented.');
   }
 

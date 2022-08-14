@@ -6,7 +6,9 @@ import 'package:windows_iap/windows_iap.dart';
 import 'package:windows_iap/windows_iap_method_channel.dart';
 import 'package:windows_iap/windows_iap_platform_interface.dart';
 
-class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsIapPlatform {
+class MockWindowsIapPlatform
+    with MockPlatformInterfaceMixin
+    implements WindowsIapPlatform {
   @override
   Stream<String> errorStream() {
     // TODO: implement errorStream
@@ -31,7 +33,7 @@ class MockWindowsIapPlatform with MockPlatformInterfaceMixin implements WindowsI
   }
 
   @override
-  Future<bool?> checkPurchase({required String storeId}) {
+  Future<bool> checkPurchase({required String storeId}) {
     // TODO: implement checkPurchase
     throw UnimplementedError();
   }
