@@ -72,19 +72,6 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   }
 
   @override
-  Stream<String> errorStream() {
-    return const EventChannel('windows_iap_event_error')
-        .receiveBroadcastStream()
-        .map((event) {
-      if (event is String) {
-        return event;
-      } else {
-        return "";
-      }
-    });
-  }
-
-  @override
   Stream<List<Product>> productsStream() {
     return const EventChannel('windows_iap_event_products')
         .receiveBroadcastStream()
@@ -99,8 +86,13 @@ class MethodChannelWindowsIap extends WindowsIapPlatform {
   }
 
   @override
-  void getProducts() {
-    methodChannel.invokeMethod<int>('getProducts');
+  Future<List<Product>> getProducts() async {
+    final result = await methodChannel.invokeMethod<String>('getProducts');
+    if (result == null) {
+      return [];
+    }
+    return parseListNotNull(
+        json: jsonDecode(escape(result)), fromJson: Product.fromJson);
   }
 
   @override

@@ -29,8 +29,6 @@ namespace windows_iap {
 
 	//////////////////////////////////////////////////////////////////////// BEGIN OF MY CODE //////////////////////////////////////////////////////////////
 	flutter::PluginRegistrarWindows* _registrar;
-	std::unique_ptr<flutter::EventSink<>> _eventError;
-	std::unique_ptr<flutter::EventSink<>> _eventProducts;
 
 	HWND GetRootWindow(flutter::FlutterView* view) {
 		return ::GetAncestor(view->GetNativeWindow(), GA_ROOT);
@@ -120,7 +118,7 @@ namespace windows_iap {
 		resultCallback->Success(flutter::EncodableValue(returnCode));
 	}
 
-	void sendProductsToFlutter(std::vector<StoreProduct> products) {
+	std::string productsToString(std::vector<StoreProduct> products) {
 		std::stringstream ss;
 		ss << "[";
 		for (int i = 0; i < products.size(); i++) {
@@ -139,22 +137,16 @@ namespace windows_iap {
 		}
 		ss << "]";
 
-		if (_eventProducts != nullptr) {
-			_eventProducts->Success(flutter::EncodableValue(ss.str()));
-		}
+		return ss.str();
 	}
 
-	foundation::IAsyncAction getProducts() {
+	foundation::IAsyncAction getProducts(std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> resultCallback) {
 		auto result = co_await getStore().GetAssociatedStoreProductsAsync({ L"Consumable", L"Durable", L"UnmanagedConsumable" });
 		if (result.ExtendedError().value != S_OK) {
-			if (_eventError != nullptr)
-				_eventError->Success(flutter::EncodableValue("Code: " + std::to_string(result.ExtendedError().value) + " - " + getExtendedErrorString(result.ExtendedError())));
-			if (_eventProducts != nullptr)
-				_eventProducts->Success(flutter::EncodableValue("[]"));
+			resultCallback->Error(std::to_string(result.ExtendedError().value), getExtendedErrorString(result.ExtendedError()));
 		}
 		else if (result.Products().Size() == 0) {
-			if (_eventProducts != nullptr)
-				_eventProducts->Success(flutter::EncodableValue("[]"));
+			resultCallback->Success(flutter::EncodableValue("[]"));
 
 		}
 		else {
@@ -164,7 +156,8 @@ namespace windows_iap {
 				StoreProduct product = addOn.Value();
 				products.push_back(product);
 			}
-			sendProductsToFlutter(products);
+			std::string productsString = productsToString(products);
+			resultCallback->Success(flutter::EncodableValue(productsString));
 		}
 	}
 
@@ -253,38 +246,6 @@ namespace windows_iap {
 			plugin_pointer->HandleMethodCall(call, std::move(result));
 		});
 
-		///////////////////////// register for event error
-		auto eventError = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
-			registrar->messenger(), "windows_iap_event_error",
-			&flutter::StandardMethodCodec::GetInstance());
-		auto handlerError = std::make_unique<flutter::StreamHandlerFunctions<>>(
-			[](const flutter::EncodableValue* arguments,
-				std::unique_ptr<flutter::EventSink<>>&& events)
-			-> std::unique_ptr<flutter::StreamHandlerError<>> {
-				_eventError = std::move(events);
-				return nullptr;
-			},
-			[](const flutter::EncodableValue* arguments)
-				-> std::unique_ptr<flutter::StreamHandlerError<>> { return nullptr; });
-
-		eventError->SetStreamHandler(std::move(handlerError));
-
-		//////////////////////// register for event products
-		auto eventProducts = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
-			registrar->messenger(), "windows_iap_event_products",
-			&flutter::StandardMethodCodec::GetInstance());
-		auto handlerProducts = std::make_unique<flutter::StreamHandlerFunctions<>>(
-			[](const flutter::EncodableValue* arguments,
-				std::unique_ptr<flutter::EventSink<>>&& events)
-			-> std::unique_ptr<flutter::StreamHandlerError<>> {
-				_eventProducts = std::move(events);
-				return nullptr;
-			},
-			[](const flutter::EncodableValue* arguments)
-				-> std::unique_ptr<flutter::StreamHandlerError<>> { return nullptr; });
-
-		eventProducts->SetStreamHandler(std::move(handlerProducts));
-
 		registrar->AddPlugin(std::move(plugin));
 	}
 
@@ -301,7 +262,7 @@ namespace windows_iap {
 			makePurchase(to_hstring(storeId), std::move(result));
 		}
 		else if (method_call.method_name().compare("getProducts") == 0) {
-			getProducts();
+			getProducts(std::move(result));
 		}
 		else if (method_call.method_name().compare("checkPurchase") == 0) {
 			auto args = std::get<flutter::EncodableMap>(*method_call.arguments());

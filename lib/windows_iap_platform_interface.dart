@@ -30,15 +30,7 @@ abstract class WindowsIapPlatform extends PlatformInterface {
     throw UnimplementedError('makePurchase() has not been implemented.');
   }
 
-  Stream<String> errorStream() {
-    throw UnimplementedError('errorStream() has not been implemented.');
-  }
-
-  Stream<List<Product>> productsStream() {
-    throw UnimplementedError('productsStream() has not been implemented.');
-  }
-
-  void getProducts() {
+  Future<List<Product>> getProducts() {
     throw UnimplementedError('getProducts() has not been implemented.');
   }
 

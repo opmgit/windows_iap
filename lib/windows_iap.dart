@@ -12,19 +12,12 @@ enum StorePurchaseStatus {
 }
 
 class WindowsIap {
-  Stream<String> errorStream() {
-    return WindowsIapPlatform.instance.errorStream();
-  }
-
-  Stream<List<Product>> productsStream() {
-    return WindowsIapPlatform.instance.productsStream();
-  }
-
   Future<StorePurchaseStatus?> makePurchase(String storeId) {
     return WindowsIapPlatform.instance.makePurchase(storeId);
   }
 
-  void getProducts() {
+  /// throw PlatformException if error
+  Future<List<Product>> getProducts() {
     return WindowsIapPlatform.instance.getProducts();
   }
 
