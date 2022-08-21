@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:windows_iap/models/product.dart';
 
 import 'models/store_license.dart';
@@ -18,6 +21,12 @@ class WindowsIap {
 
   /// throw PlatformException if error
   Future<List<Product>> getProducts() {
+    if (Platform.isMacOS) {
+      return Future.delayed(const Duration(seconds: 2), () {
+        throw PlatformException(
+            code: '123123123', message: 'Products can not loaded now.');
+      });
+    }
     return WindowsIapPlatform.instance.getProducts();
   }
 
@@ -39,6 +48,9 @@ class WindowsIap {
   ///
   /// -- return false if all Add-On have IsActive status = false.
   Future<bool> checkPurchase({String storeId = ''}) {
+    if (Platform.isMacOS) {
+      return Future.value(false);
+    }
     return WindowsIapPlatform.instance.checkPurchase(storeId: storeId);
   }
 
