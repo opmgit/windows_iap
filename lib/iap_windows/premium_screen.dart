@@ -2,13 +2,10 @@
 import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:windows_iap/models/product.dart';
 import 'package:windows_iap/windows_iap.dart';
 import 'package:windows_iap/windows_iap_platform_interface.dart';
 
-final iapWindowsProductsProvider = FutureProvider<List<Product>>((ref) async {
-  return WindowsIap().getProducts();
-});
+import 'iap_windows_providers.dart';
 
 class BuyScreenWindows extends ConsumerStatefulWidget {
   const BuyScreenWindows({this.title = 'Buy options', Key? key}) : super(key: key);
@@ -23,7 +20,7 @@ class _BuyScreenWindowsState extends ConsumerState<BuyScreenWindows> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.refresh(iapWindowsProductsProvider);
+      ref.refresh(iapWindowsProvider);
     });
   }
 
@@ -35,7 +32,7 @@ class _BuyScreenWindowsState extends ConsumerState<BuyScreenWindows> {
       ),
       body: Center(
         child: Consumer(builder: (context, ref, child) {
-          final products = ref.watch(iapWindowsProductsProvider);
+          final products = ref.watch(iapWindowsProvider);
           return products.when(data: (data) {
             if (data.isEmpty) {
               return const Text('Upgrade options cannot be loaded at this time.');
