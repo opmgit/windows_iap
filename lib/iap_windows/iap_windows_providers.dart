@@ -10,8 +10,8 @@ final iapWindowsProvider = FutureProvider<List<Product>>((ref) async {
   return WindowsIap().getProducts();
 });
 
-class IapNotifierWindows extends IapNotifier {
-  IapNotifierWindows(super.ref);
+class IapWindowsNotifier extends IapNotifier {
+  IapWindowsNotifier(super.ref);
 
   final iap = WindowsIap();
 
