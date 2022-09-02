@@ -1,8 +1,7 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:iap_interface/iap_interface.dart';
-import 'package:windows_iap/iap_windows/premium_screen.dart';
-import 'package:windows_iap/windows_iap.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iap_interface/iap_interface.dart';
+import 'package:windows_iap/windows_iap.dart';
 
 import '../models/product.dart';
 
@@ -22,7 +21,7 @@ class IapWindowsNotifier extends IapNotifier {
 
   @override
   Future<void> fetchProducts() async {
-    await iap.getProducts();
+    super.ref.refresh(iapWindowsProvider);
   }
 
   @override
@@ -33,11 +32,17 @@ class IapWindowsNotifier extends IapNotifier {
 
   @override
   Future<void> makePurchase(String storeId) async {
-    await iap.makePurchase(storeId);
+    final result = await iap.makePurchase(storeId);
+    if (result == StorePurchaseStatus.alreadyPurchased || result == StorePurchaseStatus.succeeded) {
+      state =
+          state.copyWith(message: IapMessage.from('You have made a successful purchase.', true));
+    } else {
+      state = state.copyWith(message: IapMessage.from('Purchase is not success.', true));
+    }
   }
 
   @override
   Widget buyScreen({String title = 'Buy options'}) {
-    return BuyScreenWindows(title: title);
+    return BuyScreen(title: title);
   }
 }

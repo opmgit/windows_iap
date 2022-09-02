@@ -15,6 +15,7 @@ dependencies:
   iap_interface:
     git:
       url: https://github.com/AndesGroup-TNG/iap_interface.git
+  flutter_riverpod: ^2.0.0-dev.9
 
 dev_dependencies:
   flutter_test:

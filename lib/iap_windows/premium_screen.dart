@@ -2,20 +2,20 @@
 import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iap_interface/iap_interface.dart';
 import 'package:windows_iap/windows_iap.dart';
-import 'package:windows_iap/windows_iap_platform_interface.dart';
 
 import 'iap_windows_providers.dart';
 
-class BuyScreenWindows extends ConsumerStatefulWidget {
-  const BuyScreenWindows({this.title = 'Buy options', Key? key}) : super(key: key);
+class BuyScreen extends ConsumerStatefulWidget {
+  const BuyScreen({this.title = 'Buy options', Key? key}) : super(key: key);
   final String title;
 
   @override
-  ConsumerState<BuyScreenWindows> createState() => _BuyScreenWindowsState();
+  ConsumerState<BuyScreen> createState() => _BuyScreenState();
 }
 
-class _BuyScreenWindowsState extends ConsumerState<BuyScreenWindows> {
+class _BuyScreenState extends ConsumerState<BuyScreen> {
   @override
   void initState() {
     super.initState();
@@ -35,7 +35,7 @@ class _BuyScreenWindowsState extends ConsumerState<BuyScreenWindows> {
           final products = ref.watch(iapWindowsProvider);
           return products.when(data: (data) {
             if (data.isEmpty) {
-              return const Text('Upgrade options cannot be loaded at this time.');
+              return const Text('Buy options cannot be loaded at this time.');
             }
             return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -58,14 +58,7 @@ class _BuyScreenWindowsState extends ConsumerState<BuyScreenWindows> {
                       subtitle: Text(i.description ?? ''),
                       trailing: Text(i.price ?? ''),
                       onTap: () async {
-                        final result =
-                            await WindowsIapPlatform.instance.makePurchase(i.storeId ?? '');
-                        if (result == StorePurchaseStatus.alreadyPurchased ||
-                            result == StorePurchaseStatus.succeeded) {
-                          showAlertDialog(context,
-                              title: 'CONGRATULATIONS',
-                              content: 'You have made a successful purchase.');
-                        }
+                        ref.read(iapProvider.notifier).makePurchase(i.storeId ?? '');
                       },
                     ),
                   );
