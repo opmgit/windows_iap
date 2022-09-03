@@ -8,8 +8,9 @@ import 'package:windows_iap/windows_iap.dart';
 import 'iap_windows_providers.dart';
 
 class BuyScreen extends ConsumerStatefulWidget {
-  const BuyScreen({this.title = 'Buy options', Key? key}) : super(key: key);
+  const BuyScreen({this.title = 'Buy options', this.showAppbar = true, Key? key}) : super(key: key);
   final String title;
+  final bool showAppbar;
 
   @override
   ConsumerState<BuyScreen> createState() => _BuyScreenState();
@@ -27,9 +28,11 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: widget.showAppbar
+          ? AppBar(
+              title: Text(widget.title),
+            )
+          : null,
       body: Center(
         child: Consumer(builder: (context, ref, child) {
           final products = ref.watch(iapWindowsProvider);
