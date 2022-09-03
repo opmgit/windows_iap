@@ -26,6 +26,7 @@ class IapWindowsNotifier extends IapNotifier {
 
   @override
   Future<void> init() async {
+    super.init();
     final havePremium = await checkPurchase();
     state = state.copyWith(havePremium: havePremium, mustShowNoteSubscription: true);
   }
@@ -34,6 +35,7 @@ class IapWindowsNotifier extends IapNotifier {
   Future<void> makePurchase(String storeId) async {
     final result = await iap.makePurchase(storeId);
     if (result == StorePurchaseStatus.alreadyPurchased || result == StorePurchaseStatus.succeeded) {
+      ref.read(iapProvider.notifier).buyDiamondsIfNeed(storeId);
       state =
           state.copyWith(message: IapMessage.from('You have made a successful purchase.', true));
     } else {
