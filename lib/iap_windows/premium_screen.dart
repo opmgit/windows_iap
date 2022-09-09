@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iap_interface/iap_interface.dart';
 import 'package:windows_iap/windows_iap.dart';
@@ -38,7 +39,7 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
           final products = ref.watch(iapWindowsProvider);
           return products.when(data: (data) {
             if (data.isEmpty) {
-              return const Text('Buy options cannot be loaded at this time.');
+              return const Text('Buy options cannot be loaded at this time, please try again.');
             }
             return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -67,6 +68,11 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
                   );
                 });
           }, error: (e, s) {
+            if (e is PlatformException && e.code == '-2143330041') {
+              return const Center(
+                child: Text('Buy options cannot be loaded at this time, please try again.'),
+              );
+            }
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(16),
