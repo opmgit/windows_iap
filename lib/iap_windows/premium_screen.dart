@@ -18,7 +18,7 @@ class BuyScreen extends ConsumerStatefulWidget {
 }
 
 const note =
-    'Buy options cannot be loaded at this time, please try again.\nNote for review team: add-ons only can submit once this app have been live in the store, so you can not see any purchase options when review app.';
+    'Buy options cannot be loaded at this time, please try again.\nNote for review team: I can only submit add-ons when the application has been approved and available on the store, so before the application is available on the store, there will be no purchase option to be displayed.';
 
 class _BuyScreenState extends ConsumerState<BuyScreen> {
   @override
