@@ -17,6 +17,9 @@ class BuyScreen extends ConsumerStatefulWidget {
   ConsumerState<BuyScreen> createState() => _BuyScreenState();
 }
 
+const note =
+    'Buy options cannot be loaded at this time, please try again.\nPlease note: add-ons only can show once this app have been live in the store.';
+
 class _BuyScreenState extends ConsumerState<BuyScreen> {
   @override
   void initState() {
@@ -39,7 +42,7 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
           final products = ref.watch(iapWindowsProvider);
           return products.when(data: (data) {
             if (data.isEmpty) {
-              return const Text('Buy options cannot be loaded at this time, please try again.');
+              return const Text(note, textAlign: TextAlign.center);
             }
             return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -70,7 +73,7 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
           }, error: (e, s) {
             if (e is PlatformException && e.code == '-2143330041') {
               return const Center(
-                child: Text('Buy options cannot be loaded at this time, please try again.'),
+                child: Text(note, textAlign: TextAlign.center),
               );
             }
             return Center(
