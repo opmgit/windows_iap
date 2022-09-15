@@ -9,16 +9,15 @@ import 'package:windows_iap/windows_iap.dart';
 import 'iap_windows_providers.dart';
 
 class BuyScreen extends ConsumerStatefulWidget {
-  const BuyScreen({this.title = 'Buy options', this.showAppbar = true, Key? key}) : super(key: key);
+  const BuyScreen(
+      {this.title = 'Buy options', this.showAppbar = true, Key? key})
+      : super(key: key);
   final String title;
   final bool showAppbar;
 
   @override
   ConsumerState<BuyScreen> createState() => _BuyScreenState();
 }
-
-const note =
-    'Buy options cannot be loaded at this time, please try again.\nNote for review team: I can only submit add-ons when the application has been approved and available on the store, so before the application is available on the store, there will be no purchase option to be displayed.';
 
 class _BuyScreenState extends ConsumerState<BuyScreen> {
   @override
@@ -27,6 +26,34 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.refresh(iapWindowsProvider);
     });
+  }
+
+  Widget noteWidget() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Buy options cannot be loaded at this time, please try again.',
+            textAlign: TextAlign.center,
+          ),
+          const Gap(16),
+          Text(
+            'If you are reviewer, please note.',
+            textAlign: TextAlign.center,
+            style:
+                TextStyles.t36B.copyWith(color: Theme.of(context).primaryColor),
+          ),
+          const Gap(16),
+          const Text(
+            'The Microsoft Store requires apps to be approved before add-ons can be submitted, so before the application is available on the store, there will be no purchase option to be displayed.',
+            textAlign: TextAlign.center,
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -42,7 +69,7 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
           final products = ref.watch(iapWindowsProvider);
           return products.when(data: (data) {
             if (data.isEmpty) {
-              return const Text(note, textAlign: TextAlign.center);
+              return noteWidget();
             }
             return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -65,16 +92,16 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
                       subtitle: Text(i.description ?? ''),
                       trailing: Text(i.price ?? ''),
                       onTap: () async {
-                        ref.read(iapProvider.notifier).makePurchase(i.storeId ?? '');
+                        ref
+                            .read(iapProvider.notifier)
+                            .makePurchase(i.storeId ?? '');
                       },
                     ),
                   );
                 });
           }, error: (e, s) {
             if (e is PlatformException && e.code == '-2143330041') {
-              return const Center(
-                child: Text(note, textAlign: TextAlign.center),
-              );
+              return noteWidget();
             }
             return Center(
               child: Padding(
