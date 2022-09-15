@@ -29,30 +29,9 @@ class _BuyScreenState extends ConsumerState<BuyScreen> {
   }
 
   Widget noteWidget() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            'Buy options cannot be loaded at this time, please try again.',
-            textAlign: TextAlign.center,
-          ),
-          const Gap(16),
-          Text(
-            'If you are reviewer, please note.',
-            textAlign: TextAlign.center,
-            style:
-                TextStyles.t36B.copyWith(color: Theme.of(context).primaryColor),
-          ),
-          const Gap(16),
-          const Text(
-            'The Microsoft Store requires apps to be approved before add-ons can be submitted, so before the application is available on the store, there will be no purchase option to be displayed.',
-            textAlign: TextAlign.center,
-          )
-        ],
-      ),
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Center(child: Text('Empty.')),
     );
   }
 
