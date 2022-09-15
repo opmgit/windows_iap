@@ -10,7 +10,7 @@ import 'iap_windows_providers.dart';
 
 class BuyScreen extends ConsumerStatefulWidget {
   const BuyScreen(
-      {this.title = 'Buy options', this.showAppbar = true, Key? key})
+      {this.title = 'Premium', this.showAppbar = true, Key? key})
       : super(key: key);
   final String title;
   final bool showAppbar;
