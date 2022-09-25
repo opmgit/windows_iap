@@ -47,4 +47,9 @@ class IapWindowsNotifier extends IapNotifier {
   Widget buyScreen({String title = 'Premium', bool showAppbar = true}) {
     return BuyScreen(title: title, showAppbar: showAppbar);
   }
+
+  @override
+  Future<void> restorePurchase() async{
+
+  }
 }
