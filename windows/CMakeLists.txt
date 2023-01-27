@@ -9,7 +9,7 @@ set(PROJECT_NAME "windows_iap")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
 include(FetchContent)
-set(CPPWINRT_VERSION "2.0.220608.4")
+set(CPPWINRT_VERSION "2.0.221121.5")
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed
@@ -17,7 +17,7 @@ set(PLUGIN_NAME "windows_iap_plugin")
 
 ################ NuGet intall begin ################
 FetchContent_Declare(nuget
-  URL "https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
+  URL "https://dist.nuget.org/win-x86-commandline/v6.4.0/nuget.exe"
   URL_HASH SHA256=a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
   DOWNLOAD_NO_EXTRACT true
 )
