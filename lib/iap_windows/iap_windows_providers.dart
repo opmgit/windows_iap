@@ -38,7 +38,7 @@ class IapWindowsNotifier extends IapNotifier {
       ref.read(iapProvider.notifier).buyDiamondsIfNeed(storeId);
       state = state.copyWith(message: IapMessage.from('Successful.', true));
     } else {
-      state = state.copyWith(message: IapMessage.from('Fail.', true));
+      state = state.copyWith(message: IapMessage.from('Canceled.', true));
     }
   }
 
