@@ -1,7 +1,7 @@
 name: windows_iap
 description: A new Flutter project.
 version: 0.0.1
-homepage:
+homepage: https://github.com/opmgit/windows_iap
 
 environment:
   sdk: ">=2.19.0 <3.0.0"
@@ -12,8 +12,7 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.1.4
   andesgroup_common: 1.0.19
-  iap_interface:
-    path: ../iap_interface
+  iap_interface: ^0.0.1
   flutter_riverpod: ^2.3.2
 
 dev_dependencies:

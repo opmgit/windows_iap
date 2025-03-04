@@ -8,8 +8,6 @@ import 'package:windows_iap/models/product.dart';
 import 'models/store_license.dart';
 import 'windows_iap_platform_interface.dart';
 
-export 'iap_windows/iap_windows_providers.dart';
-export 'iap_windows/premium_screen.dart';
 
 enum StorePurchaseStatus {
   succeeded,
